@@ -130,3 +130,29 @@
 
 (define c!
   (lambda (n) (ccdr ((n step!) ((ccons c0) c1)))))
+
+(define gamma!
+  (lambda (f)
+    (lambda (n)
+      (((c=0 n) c1)
+       ((c* n) (f (cp n)))))))
+
+(define gamma!!
+  (lambda (f)
+    (lambda (n)
+      (((c=0 n) (lambda (y) (c1 y)))
+       (lambda (y) (((c* n) (f (cp n))) y))))))
+
+
+(define Y
+  (lambda (f)
+    ((lambda (x) (f (x x))) (lambda (x) (f (x x))))))
+
+(define Z
+  (lambda (f)
+    ((lambda (x) (f (lambda (z) ((x x) z))))
+     (lambda (x) (f (lambda (z) ((x x) z)))))))
+
+;; (define c!! (Y gamma!))
+;; (define c!! (Z gamma!))
+(define c!! (Z gamma!!))
