@@ -6,6 +6,11 @@ i(abs(x,x)).
 k(abs(x,abs(y,x))).
 kstar(abs(x,abs(y,y))).
 s(abs(x,abs(y,abs(z,app(app(x,z),app(y,z)))))).
+c0(T) :- kstar(T).
+c1(abs(f,abs(x,app(f,x)))).
+c4(abs(f,abs(x,app(f,app(f,app(f,app(f,x))))))).
+w(abs(x,app(x,x))).
+omega(app(W,W)) :- w(W).
 
 % 1. alpha, beta, gamma, ....
 %% 2. from_to(S, T)
@@ -27,7 +32,11 @@ ts((alpha --> beta --> gamma) --> (alpha --> beta) --> alpha --> gamma).
 
 % abs(x,x) : alpha --> alpha
 
+:- set_prolog_flag(occurs_check, true).
+
 % types(Gamma, M : T).
+
+% types(+Gamma, +M, ?T).
 
 types(Gamma, X : T)                :- member(X : T, Gamma).
 types(Gamma, app(M1, M2) : S)      :- types(Gamma, M1 : R --> S),
