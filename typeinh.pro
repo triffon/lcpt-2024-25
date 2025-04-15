@@ -29,6 +29,8 @@ tk(alpha --> beta --> alpha).
 tkstar(alpha --> beta --> beta).
 tc((alpha --> alpha) --> alpha --> alpha).
 ts((alpha --> beta --> gamma) --> (alpha --> beta) --> alpha --> gamma).
+ty((alpha --> alpha) --> alpha).
+tx(alpha --> (alpha --> beta) --> (beta --> alpha) --> beta).
 
 :- op(150, xfx, :).
 
@@ -36,10 +38,10 @@ ts((alpha --> beta --> gamma) --> (alpha --> beta) --> alpha --> gamma).
 
 :- set_prolog_flag(occurs_check, true).
 
-% types(+Gamma, -Ms, +ArgTypes)
-types(_, [], []).
-types(Gamma, [M | Ms], [T | Ts]) :- types(Gamma, M : T),
-                                    types(Gamma, Ms, Ts).
+% types(+Visited, +Gamma, -Ms, +ArgTypes)
+types(_, _, [], []).
+types(V, Gamma, [M | Ms], [T | Ts]) :- types(V, Gamma, M : T),
+                                       types(V, Gamma, Ms, Ts).
 
 % deconstruct_type(+T, ?ArgTypes, ?ResultType).
 deconstruct_type(Alpha, [], Alpha). % :- atom(Alpha).
@@ -49,13 +51,12 @@ deconstruct_type(R --> S, [R | ArgTypes], ResultType) :- deconstruct_type(S, Arg
 construct_app(Fun, [], Fun).
 construct_app(Fun, [Arg | Args], Term) :- construct_app(app(Fun, Arg), Args, Term).
 
-% types(Gamma, M : T).
+% types(+Visited, +Gamma, +M : ?T).
 
-% types(+Gamma, +M : ?T).
-
-types(Gamma, abs(X, N) : R --> S)  :- types([X : R | Gamma], N : S).
-types(Gamma, M : S)                :- member(X : T, Gamma),
-                                      deconstruct_type(T, ArgTypes, S),
-                                      types(Gamma, Ms, ArgTypes),
-                                      construct_app(X, Ms, M).
-types(M : T) :- types([], M : T).
+types(V, Gamma, abs(X, N) : R --> S)  :- types(V, [X : R | Gamma], N : S).
+types(V, Gamma, M : S)                :- not(member(S, V)),
+                                         member(X : T, Gamma),
+                                         deconstruct_type(T, ArgTypes, S),
+                                         types([S | V], Gamma, Ms, ArgTypes),
+                                         construct_app(X, Ms, M).
+types(M : T) :- types([], [], M : T).
