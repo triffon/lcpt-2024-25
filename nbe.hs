@@ -33,7 +33,7 @@ type Valuation = String -> H
 modify :: Valuation -> String -> H -> Valuation
 modify xi x a y
  | x == y = a
- | x /= y = xi x
+ | x /= y = xi y
 
 evaluate :: L -> Valuation -> H
 evaluate (Var x)    xi = xi x
