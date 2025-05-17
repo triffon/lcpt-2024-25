@@ -60,9 +60,12 @@ reify (r :=> s) (Fun f) =
     c <- reify s b
     return $ Abs x c
 
-nbe :: T -> L -> IO L
-nbe t m = do a <- evaluate m error
-             reify t a
+type Context = [(String, T)]
 
-skk = nbe ti $ s :@ k :@k
-c8  = nbe tc $ cplus :@ (c 3) :@ (c 5)
+nbe :: Context -> T -> L -> IO L
+nbe g t m = do a <- evaluate m (\x -> reflect (fromJust (lookup x g)) (Var x))
+               reify t a
+
+skk = nbe [] ti $ s :@ k :@k
+c8  = nbe [] tc $ cplus :@ (c 3) :@ (c 5)
+fffx = nbe [("f", ti), ("x", TVar "alpha")] (TVar "alpha") $ (c 3) :@ Var "f" :@ Var "x"
